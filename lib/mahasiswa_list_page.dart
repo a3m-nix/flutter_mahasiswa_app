@@ -19,21 +19,6 @@ class _MahasiswaListPageState extends State<MahasiswaListPage> {
     getData();
   }
 
-  void deleteData(id) {
-    EasyLoading.show();
-    var url = Uri.parse('http://belajar-api.unama.ac.id/api/mahasiswa/$id');
-    http.delete(url).then((response) {
-      EasyLoading.dismiss();
-      if (response.statusCode == 200) {
-        EasyLoading.showSuccess('Data berhasil dihapus');
-        getData();
-      } else {
-        var responJson = jsonDecode(response.body);
-        EasyLoading.showError('Ops..' + responJson['message']);
-      }
-    });
-  }
-
   List listData = [];
   void getData() async {
     EasyLoading.show();
@@ -62,7 +47,20 @@ class _MahasiswaListPageState extends State<MahasiswaListPage> {
                 children: [
                   IconButton(
                     onPressed: () {
-                      deleteData(listData[index]['id']);
+                      EasyLoading.show();
+                      var url = Uri.parse(
+                          'http://belajar-api.unama.ac.id/api/mahasiswa/${listData[index]['id']}');
+                      http.delete(url).then((response) {
+                        EasyLoading.dismiss();
+                        if (response.statusCode == 200) {
+                          EasyLoading.showSuccess('Data berhasil dihapus');
+                          getData();
+                        } else {
+                          var responJson = jsonDecode(response.body);
+                          EasyLoading.showError(
+                              'Ops..' + responJson['message']);
+                        }
+                      });
                     },
                     icon: Icon(Icons.delete),
                   ),
