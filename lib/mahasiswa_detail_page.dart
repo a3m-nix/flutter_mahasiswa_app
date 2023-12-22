@@ -22,7 +22,12 @@ class _MahasiswaDetailPageState extends State<MahasiswaDetailPage> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Image.network(dataMhs['foto']),
+          Image.network(
+            dataMhs['foto'],
+            width: MediaQuery.of(context).size.width,
+            height: 200,
+            fit: BoxFit.cover,
+          ),
           SizedBox(height: 10),
           Container(
             margin: EdgeInsets.only(left: 10),

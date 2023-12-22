@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class MahasiswaEditPage extends StatefulWidget {
   const MahasiswaEditPage({Key? key}) : super(key: key);
@@ -17,10 +18,12 @@ class _MahasiswaEditPageState extends State<MahasiswaEditPage> {
   final TextEditingController _nimController = TextEditingController();
   final TextEditingController _tanggalLahirController = TextEditingController();
   final TextEditingController _programStudiController = TextEditingController();
+  int id = 0;
 
   @override
   Widget build(BuildContext context) {
     final dataMhs = ModalRoute.of(context)!.settings.arguments as Map;
+    id = dataMhs['id'];
     _namaController.text = dataMhs['nama'];
     _nimController.text = dataMhs['nim'];
     _tanggalLahirController.text = dataMhs['tanggal_lahir'];
@@ -88,24 +91,21 @@ class _MahasiswaEditPageState extends State<MahasiswaEditPage> {
                 onPressed: () async {
                   if (_formKey.currentState!.validate()) {
                     EasyLoading.show();
-                    var url = Uri.parse(
-                        'http://belajar-api.unama.ac.id/api/mahasiswa/${dataMhs['id']}');
                     var data = {
                       'nama': _namaController.text,
                       'nim': _nimController.text,
                       'tanggal_lahir': _tanggalLahirController.text,
                       'program_studi': _programStudiController.text,
                     };
-                    var response = await http.put(url, body: data, headers: {
-                      'Accept': 'application/json',
-                    });
+                    final supabase = Supabase.instance.client;
+                    await supabase
+                        .from('mahasiswa')
+                        .update(data)
+                        .match({'id': id});
+                    EasyLoading.showInfo("Data berhasil diupdate");
                     EasyLoading.dismiss();
-                    if (response.statusCode == 200) {
-                      EasyLoading.showSuccess('Data berhasil diupdate');
-                    } else {
-                      var responJson = jsonDecode(response.body);
-                      EasyLoading.showError('Ops..' + responJson['message']);
-                    }
+                    Navigator.pop(context);
+                    Navigator.pop(context);
                   }
                 },
                 child: Text('Update Data'),

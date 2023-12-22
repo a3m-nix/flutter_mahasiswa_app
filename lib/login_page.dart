@@ -1,9 +1,8 @@
-// ignore_for_file: prefer_const_constructors
+// ignore_for_file: prefer_const_constructors, use_build_context_synchronously
 
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -72,23 +71,16 @@ class _LoginPageState extends State<LoginPage> {
                       onPressed: () async {
                         if (_formKey.currentState!.validate()) {
                           EasyLoading.show();
-                          var url = Uri.parse(
-                              'http://belajar-api.unama.ac.id/api/login');
-                          var data = {
-                            'email': _emailController.text,
-                            'password': _passwordController.text,
-                          };
-                          var response =
-                              await http.post(url, body: data, headers: {
-                            'Accept': 'application/json',
-                          });
-                          EasyLoading.dismiss();
-                          if (response.statusCode == 200) {
+                          final supabase = Supabase.instance.client;
+                          try {
+                            await supabase.auth.signInWithPassword(
+                              email: _emailController.text,
+                              password: _passwordController.text,
+                            );
+                            EasyLoading.dismiss();
                             Navigator.pushReplacementNamed(context, '/home');
-                          } else {
-                            var responJson = jsonDecode(response.body);
-                            EasyLoading.showError(
-                                'Ops...${responJson['message']}');
+                          } catch (e) {
+                            EasyLoading.showInfo("Ops...$e");
                           }
                         }
                       },

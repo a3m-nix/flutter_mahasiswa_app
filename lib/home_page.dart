@@ -1,8 +1,11 @@
-// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
+// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, use_build_context_synchronously
 
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -12,11 +15,31 @@ class HomePage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('My Flutter!'),
+        actions: [
+          IconButton(
+            onPressed: () async {
+              try {
+                await Supabase.instance.client.auth.signOut();
+                Navigator.pushReplacementNamed(context, '/login');
+              } catch (e) {
+                EasyLoading.showInfo("Ops...$e");
+              }
+            },
+            icon: Icon(Icons.logout_outlined),
+          ),
+        ],
       ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            Container(
+              margin: EdgeInsets.all(10),
+              child: Text(
+                'Selamat Datang, ${Supabase.instance.client.auth.currentUser!.email!}',
+                style: TextStyle(fontSize: 18),
+              ),
+            ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [

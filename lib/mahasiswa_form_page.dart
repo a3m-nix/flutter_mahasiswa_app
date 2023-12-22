@@ -4,6 +4,7 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class MahasiswaFormPage extends StatefulWidget {
   const MahasiswaFormPage({Key? key}) : super(key: key);
@@ -17,8 +18,23 @@ class _MahasiswaFormPageState extends State<MahasiswaFormPage> {
   final TextEditingController _namaController = TextEditingController();
   final TextEditingController _nimController = TextEditingController();
   final TextEditingController _tanggalLahirController = TextEditingController();
-  final TextEditingController _programStudiController =
+  final TextEditingController _listProgramStudiController =
       TextEditingController(text: 'SI');
+
+  var listProgramStudi = [];
+
+  @override
+  void initState() {
+    super.initState();
+    getProgramStudi();
+  }
+
+  void getProgramStudi() async {
+    var data = await Supabase.instance.client.from('program_studi').select();
+    setState(() {
+      listProgramStudi = data;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -82,27 +98,19 @@ class _MahasiswaFormPageState extends State<MahasiswaFormPage> {
               ),
               DropdownButtonFormField(
                 isExpanded: true,
-                value: _programStudiController.text,
+                value: _listProgramStudiController.text,
                 decoration: InputDecoration(
                   labelText: 'Program Studi',
                 ),
-                items: const [
-                  DropdownMenuItem(
-                    value: 'SI',
-                    child: Text('Sistem Informasi'),
-                  ),
-                  DropdownMenuItem(
-                    value: 'TI',
-                    child: Text('Teknik Informatika'),
-                  ),
-                  DropdownMenuItem(
-                    value: 'SK',
-                    child: Text('Sistem Komputer'),
-                  ),
-                ],
+                items: listProgramStudi.map((item) {
+                  return DropdownMenuItem(
+                    value: item['singkatan'],
+                    child: Text(item['nama']),
+                  );
+                }).toList(),
                 onChanged: (value) {
                   setState(() {
-                    _programStudiController.text = value.toString();
+                    _listProgramStudiController.text = value.toString();
                   });
                 },
               ),
@@ -111,24 +119,21 @@ class _MahasiswaFormPageState extends State<MahasiswaFormPage> {
                 onPressed: () async {
                   if (_formKey.currentState!.validate()) {
                     EasyLoading.show();
-                    var url = Uri.parse(
-                        'http://belajar-api.unama.ac.id/api/mahasiswa');
+
                     var data = {
                       'nama': _namaController.text,
                       'nim': _nimController.text,
                       'tanggal_lahir': _tanggalLahirController.text,
-                      'program_studi': _programStudiController.text,
+                      'program_studi': _listProgramStudiController.text,
                     };
-                    var response = await http.post(url, body: data, headers: {
-                      'Accept': 'application/json',
-                    });
-                    EasyLoading.dismiss();
-                    if (response.statusCode == 201) {
+                    try {
+                      final supabase = Supabase.instance.client;
+                      await supabase.from('mahasiswa').insert(data);
                       EasyLoading.showSuccess('Data berhasil disimpan');
-                    } else {
-                      var responJson = jsonDecode(response.body);
-                      EasyLoading.showError('Ops..' + responJson['message']);
+                    } catch (e) {
+                      EasyLoading.showError('Ops..$e');
                     }
+                    EasyLoading.dismiss();
                   }
                 },
                 child: Text('Simpan'),

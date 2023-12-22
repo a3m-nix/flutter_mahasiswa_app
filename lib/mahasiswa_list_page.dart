@@ -5,6 +5,8 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import 'package:supabase_flutter/supabase_flutter.dart';
+
 class MahasiswaListPage extends StatefulWidget {
   const MahasiswaListPage({Key? key}) : super(key: key);
 
@@ -22,11 +24,10 @@ class _MahasiswaListPageState extends State<MahasiswaListPage> {
   List listData = [];
   void getData() async {
     EasyLoading.show();
-    var url = Uri.parse('http://belajar-api.unama.ac.id/api/mahasiswa');
-    var respon = await http.get(url);
-    var responJson = jsonDecode(respon.body);
+    final supabase = Supabase.instance.client;
+    final data = await supabase.from('mahasiswa').select();
     setState(() {
-      listData = responJson['data'];
+      listData = data;
     });
     EasyLoading.dismiss();
   }
@@ -46,26 +47,20 @@ class _MahasiswaListPageState extends State<MahasiswaListPage> {
               child: Row(
                 children: [
                   IconButton(
-                    onPressed: () {
+                    onPressed: () async {
                       EasyLoading.show();
-                      var url = Uri.parse(
-                          'http://belajar-api.unama.ac.id/api/mahasiswa/${listData[index]['id']}');
-                      http.delete(url).then((response) {
-                        EasyLoading.dismiss();
-                        if (response.statusCode == 200) {
-                          EasyLoading.showSuccess('Data berhasil dihapus');
-                          getData();
-                        } else {
-                          var responJson = jsonDecode(response.body);
-                          EasyLoading.showError(
-                              'Ops..' + responJson['message']);
-                        }
-                      });
+                      final supabase = Supabase.instance.client;
+                      await supabase
+                          .from('mahasiswa')
+                          .delete()
+                          .match({'id': listData[index]['id']});
+                      EasyLoading.dismiss();
+                      getData();
                     },
                     icon: Icon(Icons.delete),
                   ),
                   IconButton(
-                    onPressed: () {
+                    onPressed: () async {
                       Navigator.pushNamed(context, '/mahasiswa-edit',
                           arguments: listData[index]);
                     },
@@ -81,8 +76,8 @@ class _MahasiswaListPageState extends State<MahasiswaListPage> {
             leading: CircleAvatar(
               backgroundImage: NetworkImage(listData[index]['foto']),
             ),
-            title: Text('Nama: ' + listData[index]['nama']),
-            subtitle: Text('NIM:' + listData[index]['nim']),
+            title: Text('Nama: ' + listData[index]['nim']),
+            subtitle: Text('NIM:' + listData[index]['nama']),
           );
         },
       ),
