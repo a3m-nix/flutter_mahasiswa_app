@@ -21,6 +21,21 @@ class _MahasiswaListPageState extends State<MahasiswaListPage> {
     getData();
   }
 
+  void deleteData(id) {
+    EasyLoading.show();
+    var url = Uri.parse('http://belajar-api.unama.ac.id/api/mahasiswa/$id');
+    http.delete(url).then((response) {
+      EasyLoading.dismiss();
+      if (response.statusCode == 200) {
+        EasyLoading.showSuccess('Data berhasil dihapus');
+        getData();
+      } else {
+        var responJson = jsonDecode(response.body);
+        EasyLoading.showError('Ops..' + responJson['message']);
+      }
+    });
+  }
+
   List listData = [];
   void getData() async {
     EasyLoading.show();
@@ -47,6 +62,7 @@ class _MahasiswaListPageState extends State<MahasiswaListPage> {
               child: Row(
                 children: [
                   IconButton(
+<<<<<<< HEAD
                     onPressed: () async {
                       EasyLoading.show();
                       final supabase = Supabase.instance.client;
@@ -56,6 +72,10 @@ class _MahasiswaListPageState extends State<MahasiswaListPage> {
                           .match({'id': listData[index]['id']});
                       EasyLoading.dismiss();
                       getData();
+=======
+                    onPressed: () {
+                      deleteData(listData[index]['id']);
+>>>>>>> parent of ac51c3e (refactor)
                     },
                     icon: Icon(Icons.delete),
                   ),

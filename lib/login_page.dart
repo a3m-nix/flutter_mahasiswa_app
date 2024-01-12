@@ -1,9 +1,14 @@
+<<<<<<< HEAD
 // ignore_for_file: prefer_const_constructors, use_build_context_synchronously
 
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+=======
+import 'package:flutter/material.dart';
+    
+>>>>>>> parent of ac51c3e (refactor)
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
 
@@ -12,14 +17,11 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+<<<<<<< HEAD
         title: const Text('LOGIN'),
       ),
       body: SingleChildScrollView(
@@ -108,7 +110,11 @@ class _LoginPageState extends State<LoginPage> {
             ],
           ),
         ),
+=======
+        title: const Text(''),
+>>>>>>> parent of ac51c3e (refactor)
       ),
+      body: Container(),
     );
   }
 }

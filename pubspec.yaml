@@ -11,8 +11,11 @@ dependencies:
     sdk: flutter
   flutter_easyloading: ^3.0.5
   http: ^1.1.0
+<<<<<<< HEAD
   intl: ^0.18.1
   supabase_flutter: ^2.0.2
+=======
+>>>>>>> parent of ac51c3e (refactor)
 
 dev_dependencies:
   flutter_test:

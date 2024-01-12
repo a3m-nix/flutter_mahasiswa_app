@@ -20,6 +20,32 @@ class _MahasiswaEditPageState extends State<MahasiswaEditPage> {
   final TextEditingController _programStudiController = TextEditingController();
   int id = 0;
 
+  void _simpanForm(context, id) async {
+    if (_formKey.currentState!.validate()) {
+      EasyLoading.show();
+      var url = Uri.parse('http://belajar-api.unama.ac.id/api/mahasiswa/$id');
+      print(url);
+      var data = {
+        'nama': _namaController.text,
+        'nim': _nimController.text,
+        'tanggal_lahir': _tanggalLahirController.text,
+        'program_studi': _programStudiController.text,
+      };
+      var response = await http.put(url, body: data, headers: {
+        'Accept': 'application/json',
+      });
+      EasyLoading.dismiss();
+      if (response.statusCode == 200) {
+        EasyLoading.showSuccess('Data berhasil diupdate');
+        Navigator.pop(context);
+        Navigator.pop(context);
+      } else {
+        var responJson = jsonDecode(response.body);
+        EasyLoading.showError('Ops..' + responJson['message']);
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final dataMhs = ModalRoute.of(context)!.settings.arguments as Map;
@@ -88,6 +114,7 @@ class _MahasiswaEditPageState extends State<MahasiswaEditPage> {
               ),
               SizedBox(height: 16.0),
               ElevatedButton(
+<<<<<<< HEAD
                 onPressed: () async {
                   if (_formKey.currentState!.validate()) {
                     EasyLoading.show();
@@ -109,6 +136,10 @@ class _MahasiswaEditPageState extends State<MahasiswaEditPage> {
                   }
                 },
                 child: Text('Update Data'),
+=======
+                onPressed: () => _simpanForm(context, dataMhs['id']),
+                child: Text('Simpan'),
+>>>>>>> parent of ac51c3e (refactor)
               ),
             ],
           ),
